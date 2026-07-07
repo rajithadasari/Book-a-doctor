@@ -1,0 +1,122 @@
+const mongoose = require("mongoose");
+
+const docModel = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
+
+    fullName: {
+      type: String,
+      required: [true, "Full Name is required"],
+      set: function (value) {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+      },
+    },
+
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+    },
+
+    phone: {
+      type: String,
+      required: [true, "Phone is required"],
+    },
+
+    address: {
+      type: String,
+      required: [true, "Address is required"],
+    },
+
+    specialization: {
+      type: String,
+      required: [true, "Specialization is required"],
+    },
+
+    experience: {
+      type: String,
+      required: [true, "Experience is required"],
+    },
+
+    feesPerConsultation: {
+      type: Number,
+      required: [true, "Fees is required"],
+    },
+
+    timings: {
+      type: Array,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      default: "pending",
+    },
+
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = mongoose.model("doctor", docModel);
+const mongoose = require("mongoose");
+
+const appointmentModel = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+
+    doctorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "doctor",
+      required: true,
+    },
+
+    userInfo: {
+      type: Object,
+      required: true,
+      default: {},
+    },
+
+    doctorInfo: {
+      type: Object,
+      required: true,
+      default: {},
+    },
+
+    date: {
+      type: String,
+      required: true,
+    },
+
+    time: {
+      type: String,
+      required: true,
+    },
+
+    document: {
+      type: Object,
+      default: {},
+    },
+
+    status: {
+      type: String,
+      default: "pending",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = mongoose.model("appointment", appointmentModel);
