@@ -1,0 +1,136 @@
+backend/
+│── controllers/
+│   └── taskController.js
+│── models/
+│   └── Task.js
+│── routes/
+│   └── taskRoutes.js
+│── .env
+│── package.json
+│── server.js
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.19.2",
+    "mongoose": "^8.6.0"
+  }
+}
+npm install
+MONGO_URI=mongodb://127.0.0.1:27017/taskdb
+PORT=5000
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/tasks", require("./routes/taskRoutes"));
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected");
+    app.listen(process.env.PORT || 5000, () => {
+      console.log("Server running");
+    });
+  })
+  .catch((err) => console.log(err));
+  const mongoose = require("mongoose");
+
+const taskSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      default: "Story",
+    },
+    duration: {
+      type: String,
+      default: "29m",
+    },
+    assignedTo: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      default: "No description available",
+    },
+    resources: {
+      type: [String],
+      default: [],
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Task", taskSchema);
+const Task = require("../models/Task");
+
+exports.getTasks = async (req, res) => {
+  const tasks = await Task.find();
+  res.json(tasks);
+};
+
+exports.getTask = async (req, res) => {
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  res.json(task);
+};
+
+exports.createTask = async (req, res) => {
+  const task = new Task(req.body);
+  const saved = await task.save();
+  res.status(201).json(saved);
+};
+
+exports.updateTask = async (req, res) => {
+  const updated = await Task.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+
+  res.json(updated);
+};
+
+exports.deleteTask = async (req, res) => {
+  await Task.findByIdAndDelete(req.params.id);
+
+  res.json({
+    message: "Task deleted successfully",
+  });
+};
+const express = require("express");
+
+const router = express.Router();
+
+const controller = require("../controllers/taskController");
+
+router.get("/", controller.getTasks);
+router.get("/:id", controller.getTask);
+router.post("/", controller.createTask);
+router.put("/:id", controller.updateTask);
+router.delete("/:id", controller.deleteTask);
+
+module.exports = router;
+npm install
+npm start
